@@ -1,21 +1,11 @@
-from app import create_app
-from app.api.v1 import api
-from flask_login import LoginManager
-from app.auth import auth
+from flask import url_for
+from app import fique_app
 
-app = create_app()
-app.register_blueprint(api)
-app.register_blueprint(auth)
-
-login= LoginManager(app)
-
-@app.errorhandler(403)
-def notAuthorized():
-    return 'No autorizado'
-
-@app.route('/')
+@fique_app.route("/")
 def index():
-    return 'Hello world'
+    return "hello"
+    # return f"<a href={url_for(api_fique)}>clientes</a>"
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    fique_app.run(debug=True)
