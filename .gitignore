@@ -1,3 +1,11 @@
 /__pycache__/*
 source/app/__pycache__/
 source/app/api/v1/clientes/__pycache__
+source/app/api/v1/__pycache__
+source/__pycache__
+source/app/api/models/__pycache__
+source/app/api/v1/clientes_resources/__pycache__
+source/app/api/v1/compras_resources/__pycache__
+source/app/api/v1/gastos_resources/__pycache__
+source/app/api/v1/productos_resources/__pycache__
+source/app/api/v1/ventas_resources/__pycache__
