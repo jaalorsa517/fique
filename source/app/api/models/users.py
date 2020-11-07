@@ -14,7 +14,6 @@ def getUser(nickname:str):
         cur.execute(
             'SELECT nickname,password FROM users WHERE nickname = ?',(nickname,)
         )
-        # import pdb; pdb.set_trace()
         if cur.rowcount >= 0:
             user = cur.fetchone()
             response['nickname']= user[0]
