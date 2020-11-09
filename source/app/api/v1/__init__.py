@@ -29,7 +29,7 @@ def verify_password(nickname, password):
             print(user["error"])
             return abort(500)
         elif len(user) == 0:
-            return abort(403)
+            return abort(401)
         elif nickname == user["nickname"] and check_password_hash(
             user["password"], password
         ):

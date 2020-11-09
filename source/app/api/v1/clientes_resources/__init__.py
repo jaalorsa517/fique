@@ -20,14 +20,16 @@ class ClientesResources(Resource):
                 ),
                 204,
             )
-        if "error" in data:
-            return abort(500)
-        return make_response(
-            jsonify(
-                response=dict(status="ok", http_code="200", message="sucess"), data=data
-            ),
-            200,
-        )
+        elif "error" in data[0]:
+            return abort(400)
+        else:
+            return make_response(
+                jsonify(
+                    response=dict(status="ok", http_code="200", message="sucess"),
+                    data=data,
+                ),
+                200,
+            )
 
     def post(self):
         columns = []
@@ -37,7 +39,7 @@ class ClientesResources(Resource):
             values.append(v)
         result = newResource(self._table, columns, values)
         if not result:
-            return abort(500)
+            return abort(400)
         return make_response(
             jsonify(
                 response=dict(status="ok", http_code="201", message="item created")
@@ -55,7 +57,7 @@ class ClientesResources(Resource):
         values.append(id)
         result = updateResource(self._table, columns, values)
         if not result:
-            return abort(500)
+            return abort(400)
         return make_response(
             jsonify(
                 response=dict(status="ok", http_code="201", message="item modificated")
@@ -67,7 +69,10 @@ class ClientesResources(Resource):
         column_id = "pk_id_clientes"
         result = deleteResource(self._table, column_id, id)
         if not result:
-            return abort(500)
+            return abort(400)
         return make_response(
-            jsonify(response=dict(status="ok", http_code="200", message="item deleted")), 200
+            jsonify(
+                response=dict(status="ok", http_code="200", message="item deleted")
+            ),
+            204,
         )
