@@ -44,8 +44,8 @@ from app.api.v1.ventas_resources import VentasResources
 from app.api.v1.productos_resources import ProductosResources
 from app.api.v1.gastos_resources import GastosResources
 
+api_fique.add_resource(ProductosResources, "/productos", "/productos/<int:id>")
 api_fique.add_resource(ClientesResources, "/clientes", "/clientes/<int:id>")
 api_fique.add_resource(ComprasResources, "/compras")
 api_fique.add_resource(VentasResources, "/ventas")
-api_fique.add_resource(ProductosResources, "/productos", "/productos/<int:id>")
 api_fique.add_resource(GastosResources, "/gastos")

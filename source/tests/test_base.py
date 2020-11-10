@@ -26,13 +26,9 @@ class FiqueTest(TestCase):
     _producto_data = dict(
         nombre="TestNombre",
         existencia=14,
-        precios=str(
-            dict(
-                valor_compra=1,
-                valor_por_mayor=2,
-                valor_deltal=3,
-            )
-        ),
+        valorCompra=1,
+        valorPorMayor=2,
+        valorDeltal=3,
     )
 
     def _credentials(self):
@@ -218,10 +214,44 @@ class FiqueTest(TestCase):
         )
 
     def test_api_productos_3put_with_auth(self):
-        pass
+        id_prueba = self._get_id_exist(
+            resource="clientes.productosresources",
+            name=self._producto_data["nombre"],
+            id="pk_id_productos",
+        )
+        query = self.client.put(
+            self._url("clientes.productosresources", id_prueba),
+            headers={"Authorization": "Basic " + self._credentials()},
+            data=self._producto_data,
+        )
+        if query.status_code == 400:
+            self.assert400(query)
+        else:
+            self.assertStatus(query, 201)
 
     def test_api_productos_4delete_without_auth(self):
-        pass
+        id_prueba = self._get_id_exist(
+            resource="clientes.productosresources",
+            name=self._producto_data["nombre"],
+            id="pk_id_productos",
+        )
+        self.assert401(
+            self.client.delete(
+                self._url("clientes.productosresources", id_prueba),
+            )
+        )
 
     def test_api_productos_4delete_with_auth(self):
-        pass
+        id_prueba = self._get_id_exist(
+            resource="clientes.productosresources",
+            name=self._producto_data["nombre"],
+            id="pk_id_productos",
+        )
+        query = self.client.delete(
+            self._url("clientes.productosresources", id_prueba),
+            headers={"Authorization": "Basic " + self._credentials()},
+        )
+        if query.status_code == 400:
+            self.assert400(query)
+        else:
+            self.assertStatus(query, 204)

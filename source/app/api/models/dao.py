@@ -37,6 +37,34 @@ def getId(table: str, item: dict, id: str):
         return None
 
 
+def getWithJoin(table1: str, table2: str, column1: list, column2: list, keyUnion: str):
+    """
+    Función que devuelve todos los elementos del recurso
+    :param table->Nombre de la tabla a consultar
+    :param column1->Lista de las columnas a consultar
+    :param column2->Lista de las columnas a consultar
+    :param keyUnion->Key relacionada
+    :return List(dict)-> Retorna una lista de diccionarios.
+                    Retorna error en caso de fallo en conexion.
+                    Retorna lista vacia no encuentra ninguna coicidencia.
+    """
+    data = []
+    try:
+        col1 = str.join(",", column1)
+        col2 = str.join(",", column2)
+        cur = _connection().cursor()
+        cur.execute(
+            f"SELECT {col1},{col2} FROM {table1} INNER JOIN {table2} ON {table1}.{keyUnion}={table2}.f{keyUnion[1:]}"
+        )
+        rows = cur.fetchall()
+        if len(rows) > 0:
+            for row in rows:
+                data.append(dict(zip(column1 + column2, row)))
+    except Error as e:
+        return data.append(dict(error=str(e)))
+    return data
+
+
 def getAll(table: str, columns: list):
     """
     Función que devuelve todos los elementos del recurso
