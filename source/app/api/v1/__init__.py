@@ -27,7 +27,7 @@ def verify_password(nickname, password):
         user = getUser(nickname)
         if "error" in user:
             print(user["error"])
-            return abort(500)
+            return abort(400)
         elif len(user) == 0:
             return abort(401)
         elif nickname == user["nickname"] and check_password_hash(
@@ -47,5 +47,5 @@ from app.api.v1.gastos_resources import GastosResources
 api_fique.add_resource(ClientesResources, "/clientes", "/clientes/<int:id>")
 api_fique.add_resource(ComprasResources, "/compras")
 api_fique.add_resource(VentasResources, "/ventas")
-api_fique.add_resource(ProductosResources, "/productos")
+api_fique.add_resource(ProductosResources, "/productos", "/productos/<int:id>")
 api_fique.add_resource(GastosResources, "/gastos")

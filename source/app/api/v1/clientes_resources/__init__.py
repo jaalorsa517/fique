@@ -10,10 +10,18 @@ class ClientesResources(Resource):
 
     decorators = [authorized.login_required]
 
+    def _from_dic_to_lists(self, dic):
+        columns = []
+        values = []
+        for k, v in request.form.items():
+            columns.append(k)
+            values.append(v)
+        return (columns, values)
+
     def get(self):
         columns = ["pk_id_clientes", "nombre", "apellido", "direccion", "telefono"]
         data = getAll(self._table, columns)
-        if data is None:
+        if len(data) == 0:
             return make_response(
                 jsonify(
                     response=dict(status="ok", http_code="204", message="No exist data")
@@ -32,12 +40,7 @@ class ClientesResources(Resource):
             )
 
     def post(self):
-        columns = []
-        values = []
-        for k, v in request.form.items():
-            columns.append(k)
-            values.append(v)
-        result = newResource(self._table, columns, values)
+        result = newResource(self._table, list(request.form.keys()), list(request.form.values()))
         if not result:
             return abort(400)
         return make_response(
@@ -48,14 +51,11 @@ class ClientesResources(Resource):
         )
 
     def put(self, id: int):
-        columns = []
-        values = []
-        for k, v in request.form.items():
-            columns.append(k)
-            values.append(v)
+        columns = list(request.form.keys())
+        values = list(request.form.values())
         columns.append("pk_id_clientes")
         values.append(id)
-        result = updateResource(self._table, columns, values)
+        result = updateResource(self._table, list(request.form.keys()),list( request.form.values()))
         if not result:
             return abort(400)
         return make_response(

@@ -11,6 +11,32 @@ def _connection():
     )
 
 
+def getId(table: str, item: dict, id: str):
+    """
+    Función que devuelve el id de un recursos especifico
+    :param table->Nombre de la tabla a consultar
+    :param item->Diccionario columna=valor
+    :param id->Nombre de la columna id
+    :return List(dict)-> Retorna int.
+                    Retorna error en caso de fallo en conexion.
+                    Retorna lista vacia no encuentra ninguna coicidencia.
+    """
+    try:
+        cur = _connection().cursor()
+        cur.execute(
+            "SELECT {id} FROM {table} WHERE {wh}".format(
+                id=id,
+                table=table,
+                wh=str.join(" AND ", ["{} = ? ".format(k) for (k) in item.keys()]),
+            ),
+            list(item.values()),
+        )
+        id = cur.fetchone()
+        return id[0]
+    except Error as e:
+        return None
+
+
 def getAll(table: str, columns: list):
     """
     Función que devuelve todos los elementos del recurso
@@ -72,10 +98,10 @@ def updateResource(table: str, columns: list, data: list):
         for i in range(1, len(columns) - 1):
             sql += f", {columns[i]} = ?"
         sql += f" WHERE {columns[len(columns)-1]} = {data[len(data)-1]}"
-        # import pdb
-
-        # pdb.set_trace()
-        cur.execute(sql,data,)
+        cur.execute(
+            sql,
+            data,
+        )
         con.commit()
         return True
     except Error as e:

@@ -11,11 +11,28 @@ from app.api.v1.clientes_resources import ClientesResources
 
 
 class FiqueTest(TestCase):
-    _data = dict(
+    """
+    Clase para las pruebas
+    """
+
+    ##########  Funciones y atributos privadas  ##############
+    _cliente_data = dict(
         nombre="TestNombre",
         apellido="TestApellido",
         direccion="TestDireccion",
         telefono="TestTelefono",
+    )
+
+    _producto_data = dict(
+        nombre="TestNombre",
+        existencia=14,
+        precios=str(
+            dict(
+                valor_compra=1,
+                valor_por_mayor=2,
+                valor_deltal=3,
+            )
+        ),
     )
 
     def _credentials(self):
@@ -30,15 +47,18 @@ class FiqueTest(TestCase):
             else f"{request.url_root[0 : len(request.url) - 1]}{url_for(resource)}/{id}"
         )
 
-    def _get_id_exist(self, name: str):
+    def _get_id_exist(self, resource: str, name: str, id: str):
         response = self.client.get(
-            self._url("clientes.clientesresources"),
+            self._url(resource),
             headers={"Authorization": "Basic " + self._credentials()},
         )
-        for row in response.json["data"]:
-            if row["nombre"] == name:
-                return row["pk_id_clientes"]
+        if response.get_data() != b"":
+            for row in response.json["data"]:
+                if row["nombre"] == name:
+                    return str(row[id])
+        return ""
 
+    ##########  Metodos basicos ##############
     def create_app(self):
         fique_app.config["TESTING"] = True
         return fique_app
@@ -49,10 +69,31 @@ class FiqueTest(TestCase):
     def test_index(self):
         self.assert200(self.client.get(url_for("index")))
 
-    def test_api_clientes_get_without_auth(self):
+    ##########  Metodos para el recurso clientes  ##############
+
+    def test_api_clientes_1post_without_auth(self):
+        self.assert401(
+            self.client.post(
+                self._url("clientes.clientesresources"),
+                data=self._cliente_data,
+            )
+        )
+
+    def test_api_clientes_1post_with_auth(self):
+        query = self.client.post(
+            self._url("clientes.clientesresources"),
+            headers={"Authorization": "Basic " + self._credentials()},
+            data=self._cliente_data,
+        )
+        if query.status_code == 400:
+            self.assert400(query)
+        else:
+            self.assertStatus(query, 201)
+
+    def test_api_clientes_2get_without_auth(self):
         self.assert401(self.client.get(url_for("clientes.clientesresources")))
 
-    def test_api_clientes_get_with_auth(self):
+    def test_api_clientes_2get_with_auth(self):
         query = self.client.get(
             self._url("clientes.clientesresources"),
             headers={"Authorization": "Basic " + self._credentials()},
@@ -69,58 +110,118 @@ class FiqueTest(TestCase):
         else:
             self.assert200(query)
 
-    def test_api_clientes_post_without_auth(self):
-        self.assert401(
-            self.client.post(
-                self._url("clientes.clientesresources"),
-                data=self._data,
-            )
+    def test_api_clientes_3put_without_auth(self):
+        id_prueba = self._get_id_exist(
+            resource="clientes.clientesresources",
+            name=self._cliente_data["nombre"],
+            id="pk_id_clientes",
         )
-
-    def test_api_clientes_post_with_auth(self):
-        query = self.client.post(
-            self._url("clientes.clientesresources"),
-            headers={"Authorization": "Basic " + self._credentials()},
-            data=self._data,
-        )
-        if query.status_code == 400:
-            self.assert400(query)
-        else:
-            self.assertStatus(query, 201)
-
-    def test_api_clientes_put_without_auth(self):
-        id = self._get_id_exist(self._data["nombre"])
         self.assert401(
             self.client.put(
-                self._url("clientes.clientesresources", str(id)), data=self._data
+                self._url("clientes.clientesresources", id_prueba),
+                data=self._cliente_data,
             )
         )
 
-    def test_api_clientes_put_with_auth(self):
-        id = self._get_id_exist(self._data["nombre"])
+    def test_api_clientes_3put_with_auth(self):
+        id_prueba = self._get_id_exist(
+            resource="clientes.clientesresources",
+            name=self._cliente_data["nombre"],
+            id="pk_id_clientes",
+        )
         query = self.client.put(
-            self._url("clientes.clientesresources", str(id)),
+            self._url("clientes.clientesresources", id_prueba),
             headers={"Authorization": "Basic " + self._credentials()},
-            data=self._data,
+            data=self._cliente_data,
         )
         if query.status_code == 400:
             self.assert400(query)
         else:
             self.assertStatus(query, 201)
 
-    def test_api_clientes_delete_without_auth(self):
-        id = self._get_id_exist(self._data["nombre"])
+    def test_api_clientes_4delete_without_auth(self):
+        id_prueba = self._get_id_exist(
+            resource="clientes.clientesresources",
+            name=self._cliente_data["nombre"],
+            id="pk_id_clientes",
+        )
         self.assert401(
-            self.client.delete(self._url("clientes.clientesresources", str(id)))
+            self.client.delete(self._url("clientes.clientesresources", id_prueba))
         )
 
-    def test_api_clientes_delete_with_auth(self):
-        id = self._get_id_exist(self._data["nombre"])
+    def test_api_clientes_4delete_with_auth(self):
+        id_prueba = self._get_id_exist(
+            resource="clientes.clientesresources",
+            name=self._cliente_data["nombre"],
+            id="pk_id_clientes",
+        )
         query = self.client.delete(
-            self._url("clientes.clientesresources", str(id)),
+            self._url("clientes.clientesresources", id_prueba),
             headers={"Authorization": "Basic " + self._credentials()},
         )
         if query.status_code == 400:
             self.assert400(query)
         else:
             self.assertStatus(query, 204)
+
+    ##########  Metodos para el recurso productos  ##############
+
+    def test_api_productos_1post_without_auth(self):
+        self.assert401(
+            self.client.post(
+                self._url("clientes.productosresources"), data=self._producto_data
+            )
+        )
+
+    def test_api_productos_1post_with_auth(self):
+        query = self.client.post(
+            self._url("clientes.productosresources"),
+            headers={"Authorization": "Basic " + self._credentials()},
+            data=self._producto_data,
+        )
+        if query.status_code == 400:
+            self.assert400(query)
+        else:
+            self.assertStatus(query, 201)
+
+    def test_api_productos_2get_without_auth(self):
+        self.assert401(self.client.get(self._url("clientes.productosresources")))
+
+    def test_api_productos_2get_with_auth(self):
+        query = self.client.get(
+            self._url("clientes.productosresources"),
+            headers={"Authorization": "Basic " + self._credentials()},
+        )
+
+        if query.status_code == 204:
+            self.assertStatus(
+                query,
+                204,
+            )
+
+        elif query.status_code == 400:
+            self.assert400(query)
+        else:
+            self.assert200(query)
+
+    def test_api_productos_3put_without_auth(self):
+        id_prueba = self._get_id_exist(
+            resource="clientes.productosresources",
+            name=self._producto_data["nombre"],
+            id="pk_id_productos",
+        )
+        self.assert401(
+            self.client.put(
+                self._url("clientes.productosresources", id_prueba),
+                data=self._producto_data,
+            )
+        )
+
+    def test_api_productos_3put_with_auth(self):
+        pass
+
+    def test_api_productos_4delete_without_auth(self):
+        pass
+
+    def test_api_productos_4delete_with_auth(self):
+        pass
