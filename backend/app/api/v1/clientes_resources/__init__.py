@@ -19,13 +19,14 @@ class ClientesResources(Resource):
         return (columns, values)
 
     def get(self):
-        columns = ["pk_id_clientes", "nombre", "apellido", "direccion", "telefono"]
+        columns = [
+            "pk_id_clientes", "nombre", "apellido", "direccion", "telefono"
+        ]
         data = getAll(self._table, columns)
         if len(data) == 0:
             return make_response(
-                jsonify(
-                    response=dict(status="ok", http_code="204", message="No exist data")
-                ),
+                jsonify(response=dict(
+                    status="ok", http_code="204", message="No exist data")),
                 204,
             )
         elif "error" in data[0]:
@@ -33,20 +34,22 @@ class ClientesResources(Resource):
         else:
             return make_response(
                 jsonify(
-                    response=dict(status="ok", http_code="200", message="sucess"),
+                    response=dict(status="ok",
+                                  http_code="200",
+                                  message="sucess"),
                     data=data,
                 ),
                 200,
             )
 
     def post(self):
-        result = newResource(self._table, list(request.form.keys()), list(request.form.values()))
+        result = newResource(self._table, list(request.form.keys()),
+                             list(request.form.values()))
         if not result:
             return abort(400)
         return make_response(
-            jsonify(
-                response=dict(status="ok", http_code="201", message="item created")
-            ),
+            jsonify(response=dict(
+                status="ok", http_code="201", message="item created")),
             201,
         )
 
@@ -55,13 +58,13 @@ class ClientesResources(Resource):
         values = list(request.form.values())
         columns.append("pk_id_clientes")
         values.append(id)
-        result = updateResource(self._table, list(request.form.keys()),list( request.form.values()))
+        result = updateResource(self._table, list(request.form.keys()),
+                                list(request.form.values()))
         if not result:
             return abort(400)
         return make_response(
-            jsonify(
-                response=dict(status="ok", http_code="201", message="item modificated")
-            ),
+            jsonify(response=dict(
+                status="ok", http_code="201", message="item modificated")),
             201,
         )
 
@@ -71,8 +74,7 @@ class ClientesResources(Resource):
         if not result:
             return abort(400)
         return make_response(
-            jsonify(
-                response=dict(status="ok", http_code="200", message="item deleted")
-            ),
+            jsonify(response=dict(
+                status="ok", http_code="200", message="item deleted")),
             204,
         )

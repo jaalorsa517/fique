@@ -42,6 +42,7 @@ class VentasResources(Resource):
         )
         if venta is not None:
             # Para traer los detalles de la venta
+            detalles_list = []
             for d in venta:
                 detalle = getRaw(
                     """
@@ -56,7 +57,9 @@ class VentasResources(Resource):
                     _columns_detalle,
                 )
                 if detalle is not None:
-                    venta["venta"] = detalle
+                    detalles_list.append(detalle)
+
+            venta["venta"] = detalles_list
 
         if venta is None:
             return abort(400)
@@ -184,15 +187,15 @@ class VentasResources(Resource):
     #     else:
     #         return abort(400)
 
-    # def delete(self, id):
-    #     column_fk_ventas = "fk_id_ventas"
-    #     column_id_ventas = "pk_id_ventas"
-    #     detalle = deleteResource(self._table_detalles, column_fk_ventas, id)
-    #     venta = deleteResource(self._table_ventas, column_id_ventas, id)
-    #     if not venta or not detalle:
-    #         return abort(400)
-    #     return make_response(
-    #         jsonify(response=dict(
-    #             status="ok", http_code="200", message="item deleted")),
-    #         204,
-    #     )
+    def delete(self, id):
+        column_fk_ventas = "fk_id_ventas"
+        column_id_ventas = "pk_id_ventas"
+        detalle = deleteResource(self._table_detalles, column_fk_ventas, id)
+        venta = deleteResource(self._table_ventas, column_id_ventas, id)
+        if not venta or not detalle:
+            return abort(400)
+        return make_response(
+            jsonify(response=dict(
+                status="ok", http_code="200", message="item deleted")),
+            204,
+        )
