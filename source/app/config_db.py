@@ -1,4 +1,0 @@
-MYSQL_USER = "root"
-MYSQL_PASSWORD = "root"
-MYSQL_DATABASE = "fique"
-MYSQL_HOST = "172.18.0.2"
