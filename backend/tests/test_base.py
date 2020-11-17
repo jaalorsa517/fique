@@ -250,59 +250,59 @@ class FiqueTest(TestCase):
         else:
             self.assertStatus(query, 204)
 
-    ##########  Metodos para el recurso ventas  ##############
-    _venta_data = dict(
-        fecha="2020-11-05",
-        cliente="TestNombre TestApellido",
-        venta=[dict(
-            producto="TestNombre",
-            cantidad=2,
-            valor=200,
-        )],
-    )
+    # ##########  Metodos para el recurso ventas  ##############
+    # _venta_data = dict(
+    #     fecha="2020-11-05",
+    #     cliente="TestNombre TestApellido",
+    #     venta=[dict(
+    #         producto="TestNombre",
+    #         cantidad=2,
+    #         valor=200,
+    #     )],
+    # )
 
-    def test_api_ventas_1post_without_auth(self):
-        self.assert401(
-            self.client.post(self._url("clientes.ventasresources"),
-                             data=self._venta_data))
+    # def test_api_ventas_1post_without_auth(self):
+    #     self.assert401(
+    #         self.client.post(self._url("clientes.ventasresources"),
+    #                          data=self._venta_data))
 
-    def test_api_ventas_1post_with_auth(self):
-        self.test_api_clientes_1post_with_auth()
-        self.test_api_productos_1post_with_auth()
-        query = self.client.post(
-            self._url("clientes.ventasresources"),
-            headers={
-                "Authorization": "Basic " + self._credentials(),
-                "Content-Type": "application/json",
-            },
-            data=json.dumps(self._venta_data),
-        )
-        self.test_api_clientes_4delete_with_auth()
-        self.test_api_productos_4delete_with_auth()
-        if query.status_code == 400:
-            self.assert400(query)
-        else:
-            self.assertStatus(query, 201)
+    # def test_api_ventas_1post_with_auth(self):
+    #     self.test_api_clientes_1post_with_auth()
+    #     self.test_api_productos_1post_with_auth()
+    #     query = self.client.post(
+    #         self._url("clientes.ventasresources"),
+    #         headers={
+    #             "Authorization": "Basic " + self._credentials(),
+    #             "Content-Type": "application/json",
+    #         },
+    #         data=json.dumps(self._venta_data),
+    #     )
+    #     self.test_api_clientes_4delete_with_auth()
+    #     self.test_api_productos_4delete_with_auth()
+    #     if query.status_code == 400:
+    #         self.assert400(query)
+    #     else:
+    #         self.assertStatus(query, 201)
 
-    def test_api_ventas_2get_without_auth(self):
-        self.assert401(self.client.get(self._url("clientes.ventasresources")))
+    # def test_api_ventas_2get_without_auth(self):
+    #     self.assert401(self.client.get(self._url("clientes.ventasresources")))
 
-    def test_api_ventas_2get_with_auth(self):
-        query = self.client.get(
-            self._url("clientes.ventasresources"),
-            headers={"Authorization": "Basic " + self._credentials()},
-        )
+    # def test_api_ventas_2get_with_auth(self):
+    #     query = self.client.get(
+    #         self._url("clientes.ventasresources"),
+    #         headers={"Authorization": "Basic " + self._credentials()},
+    #     )
 
-        if query.status_code == 204:
-            self.assertStatus(
-                query,
-                204,
-            )
+    #     if query.status_code == 204:
+    #         self.assertStatus(
+    #             query,
+    #             204,
+    #         )
 
-        elif query.status_code == 400:
-            self.assert400(query)
-        else:
-            self.assert200(query)
+    #     elif query.status_code == 400:
+    #         self.assert400(query)
+    #     else:
+    #         self.assert200(query)
 
     # def test_api_ventas_3patch_without_auth(self):
     #     id_prueba = self._get_id_exist(

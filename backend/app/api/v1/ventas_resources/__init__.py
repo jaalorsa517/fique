@@ -83,8 +83,7 @@ class VentasResources(Resource):
         venta_data = producto_data.pop("venta")
         cliente_column = ["nombre", "apellido"]
         detalle_column = [
-            "fk_id_producto", 'valor', 'cantidad', 'fk_id_ventas',
-            'pk_id_detalles_ventas'
+            "fk_id_producto", 'valor', 'cantidad', 'fk_id_ventas'
         ]
 
         # Obtener id_cliente
@@ -133,67 +132,67 @@ class VentasResources(Resource):
         else:
             return abort(400)
 
-    def put(self, id):
-        producto_data = request.get_json()
-        venta_data = producto_data.pop("venta")
-        cliente_column = ["nombre", "apellido"]
-        detalle_column = [
-            "fk_id_producto", 'valor', 'cantidad', 'fk_id_ventas'
-        ]
+    # def put(self, id):
+    #     producto_data = request.get_json()
+    #     venta_data = producto_data.pop("venta")
+    #     cliente_column = ["nombre", "apellido"]
+    #     detalle_column = [
+    #         "fk_id_producto", 'valor', 'cantidad', 'fk_id_ventas'
+    #     ]
 
-        # Obtener id_cliente
-        id_cliente = getId(
-            self._table_clientes,
-            dict(zip(cliente_column, str.split(" ",
-                                               producto_data["cliente"]))),
-            "pk_id_clientes",
-        )
+    #     # Obtener id_cliente
+    #     id_cliente = getId(
+    #         self._table_clientes,
+    #         dict(zip(cliente_column, str.split(" ",
+    #                                            producto_data["cliente"]))),
+    #         "pk_id_clientes",
+    #     )
 
-        venta_column = ["fecha", "fk_id_clientes", "pk_id_ventas"]
-        venta_values = [producto_data["fecha"], id_cliente, id]
+    #     venta_column = ["fecha", "fk_id_clientes", "pk_id_ventas"]
+    #     venta_values = [producto_data["fecha"], id_cliente, id]
 
-        # Guardar el encabezado en la tabla venta
-        venta = updateResource(self._table_ventas, venta_column, venta_values)
-        if venta:
-            # Obtener el id de la venta
-            for detalle in venta_data:
-                # Obtener el id del producto
-                id_producto = getId(self._table_productos,
-                                    dict(zip('nombre', detalle['producto'])),
-                                    "pk_id_productos")
-                # Obtener el id del detalle
-                id_detalle = getId(self._table_detalles,
-                                   dict(zip(detalle_column, detalle)),
-                                   'pk_id_detalles_ventas')
-                # Guardar el detalle
+    #     # Guardar el encabezado en la tabla venta
+    #     venta = updateResource(self._table_ventas, venta_column, venta_values)
+    #     if venta:
+    #         # Obtener el id de la venta
+    #         for detalle in venta_data:
+    #             # Obtener el id del producto
+    #             id_producto = getId(self._table_productos,
+    #                                 dict(zip('nombre', detalle['producto'])),
+    #                                 "pk_id_productos")
+    #             # Obtener el id del detalle
+    #             id_detalle = getId(self._table_detalles,
+    #                                dict(zip(detalle_column, detalle)),
+    #                                'pk_id_detalles_ventas')
+    #             # Guardar el detalle
 
-                detalle_venta = updateResource(
-                    self._table_detalles,
-                    detalle_column + ['pk_id_detalles_ventas'], [
-                        id_producto, detalle['valor'], detalle['cantidad'], id,
-                        id_detalle
-                    ])
+    #             detalle_venta = updateResource(
+    #                 self._table_detalles,
+    #                 detalle_column + ['pk_id_detalles_ventas'], [
+    #                     id_producto, detalle['valor'], detalle['cantidad'], id,
+    #                     id_detalle
+    #                 ])
 
-                if not detalle_venta:
-                    return abort(400)
+    #             if not detalle_venta:
+    #                 return abort(400)
 
-            return make_response(
-                jsonify(response=dict(
-                    status="ok", http_code="201", message="item update")),
-                201,
-            )
-        else:
-            return abort(400)
+    #         return make_response(
+    #             jsonify(response=dict(
+    #                 status="ok", http_code="201", message="item update")),
+    #             201,
+    #         )
+    #     else:
+    #         return abort(400)
 
-    def delete(self, id):
-        column_fk_ventas = "fk_id_ventas"
-        column_id_ventas = "pk_id_ventas"
-        detalle = deleteResource(self._table_detalles, column_fk_ventas, id)
-        venta = deleteResource(self._table_ventas, column_id_ventas, id)
-        if not venta or not detalle:
-            return abort(400)
-        return make_response(
-            jsonify(response=dict(
-                status="ok", http_code="200", message="item deleted")),
-            204,
-        )
+    # def delete(self, id):
+    #     column_fk_ventas = "fk_id_ventas"
+    #     column_id_ventas = "pk_id_ventas"
+    #     detalle = deleteResource(self._table_detalles, column_fk_ventas, id)
+    #     venta = deleteResource(self._table_ventas, column_id_ventas, id)
+    #     if not venta or not detalle:
+    #         return abort(400)
+    #     return make_response(
+    #         jsonify(response=dict(
+    #             status="ok", http_code="200", message="item deleted")),
+    #         204,
+    #     )
