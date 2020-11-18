@@ -32,7 +32,8 @@ def getRaw(sql: str, columns: List):
                 data.append(dict(zip(columns, row)))
             return data
     except Error as e:
-        return None
+        rows = [dict(error=e)]
+        return rows
 
 
 def getId(table: str, item: dict, id: str):

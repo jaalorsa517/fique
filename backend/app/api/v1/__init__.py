@@ -46,9 +46,11 @@ from app.api.v1.compras_resources import ComprasResources
 from app.api.v1.ventas_resources import VentasResources
 from app.api.v1.productos_resources import ProductosResources
 from app.api.v1.gastos_resources import GastosResources
+from app.api.v1.sincronizaciones_resources import Sincronizaciones
 
 api_fique.add_resource(ProductosResources, "/productos", "/productos/<int:id>")
 api_fique.add_resource(ClientesResources, "/clientes", "/clientes/<int:id>")
 api_fique.add_resource(ComprasResources, "/compras", "/compras/<int:id>")
 api_fique.add_resource(VentasResources, "/ventas", "/ventas/<int:id>")
 api_fique.add_resource(GastosResources, "/gastos", "/gastos/<int:id>")
+api_fique.add_resource(Sincronizaciones, "/sincronizaciones")
