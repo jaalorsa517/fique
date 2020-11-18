@@ -23,9 +23,10 @@ def getRaw(sql: str, columns: List):
     """
     data = []
     try:
-        cur = _connection().cursor()
-        cur.execute(sql)
-        rows = cur.fetchall()
+        rows = []
+        with _connection().cursor() as cur:
+            cur.execute(sql)
+            rows = cur.fetchall()
         if len(rows) > 0:
             for row in rows:
                 data.append(dict(zip(columns, row)))
@@ -45,18 +46,19 @@ def getId(table: str, item: dict, id: str):
                     Retorna lista vacia no encuentra ninguna coicidencia.
     """
     try:
-        cur = _connection().cursor()
-        cur.execute(
-            "SELECT {id} FROM {table} WHERE {wh}".format(
-                id=id,
-                table=table,
-                wh=str.join(" AND ",
-                            ["{} = ? ".format(k) for (k) in item.keys()]),
-            ),
-            list(item.values()),
-        )
-        id = cur.fetchone()
-        return id[0]
+        _id = []
+        with _connection().cursor() as cur:
+            cur.execute(
+                "SELECT {id} FROM {table} WHERE {wh}".format(
+                    id=id,
+                    table=table,
+                    wh=str.join(" AND ",
+                                ["{} = ? ".format(k) for (k) in item.keys()]),
+                ),
+                list(item.values()),
+            )
+            _id = cur.fetchone()
+        return _id[0]
     except Error as e:
         return None
 
@@ -76,13 +78,14 @@ def getWithJoin(table1: str, table2: str, column1: list, column2: list,
     """
     data = []
     try:
+        rows = []
         col1 = str.join(",", column1)
         col2 = str.join(",", column2)
-        cur = _connection().cursor()
-        cur.execute(
-            f"SELECT {col1},{col2} FROM {table1} INNER JOIN {table2} ON {table1}.{keyUnion}={table2}.f{keyUnion[1:]}"
-        )
-        rows = cur.fetchall()
+        with _connection().cursor() as cur:
+            cur.execute(
+                f"SELECT {col1},{col2} FROM {table1} INNER JOIN {table2} ON {table1}.{keyUnion}={table2}.f{keyUnion[1:]}"
+            )
+            rows = cur.fetchall()
         if len(rows) > 0:
             for row in rows:
                 data.append(dict(zip(column1 + column2, row)))
@@ -102,10 +105,11 @@ def getAll(table: str, columns: list):
     """
     data = []
     try:
+        rows = []
         col = str.join(",", columns)
-        cur = _connection().cursor()
-        cur.execute(f"SELECT {col} FROM {table}")
-        rows = cur.fetchall()
+        with _connection().cursor() as cur:
+            cur.execute(f"SELECT {col} FROM {table}")
+            rows = cur.fetchall()
         if len(rows) > 0:
             for row in rows:
                 data.append(dict(zip(columns, row)))
@@ -120,20 +124,22 @@ def newResource(table: str, columns: list, data: list):
     :param table->Nombre de la tabla a consultar
     :param columns->Lista de las columnas a crear
     :param data->Los datos a guardar
-    :return boolean-> True si crea sin problemas
-                    False si no pudo crear.
+    :return dict-> Retorna un diccionario.
+                    Retorna error en caso de fallo en conexion.
     """
     try:
-        con = _connection()
-        cur = con.cursor()
-        cur.execute(
-            f"INSERT INTO {table} ({str.join(',',columns)}) VALUES ({str.join(',',['?' for i in range(len(data))])})",
-            data,
-        )
-        con.commit()
-        return True
+        with _connection() as con:
+            cur = con.cursor()
+            cur.execute(
+                f"INSERT INTO {table} ({str.join(',',columns)}) VALUES ({str.join(',',['?' for i in range(len(data))])})",
+                data,
+            )
+            con.commit()
+            cur.execute("SELECT @@identity AS id")
+            id = cur.fetchone()
+        return dict(id=id[0])
     except Error as e:
-        return False
+        return dict(error=str(e))
 
 
 def updateResource(table: str, columns: list, data: list):
@@ -146,17 +152,17 @@ def updateResource(table: str, columns: list, data: list):
                     False si no pudo crear.
     """
     try:
-        con = _connection()
-        cur = con.cursor()
-        sql = f"UPDATE {table} SET {columns[0]} = ?"
-        for i in range(1, len(columns) - 1):
-            sql += f", {columns[i]} = ?"
-        sql += f" WHERE {columns[len(columns)-1]} = {data[len(data)-1]}"
-        cur.execute(
-            sql,
-            data,
-        )
-        con.commit()
+        with _connection() as con:
+            cur = con.cursor()
+            sql = f"UPDATE {table} SET {columns[0]} = ?"
+            for i in range(1, len(columns) - 1):
+                sql += f", {columns[i]} = ?"
+            sql += f" WHERE {columns[len(columns)-1]} = {data[len(data)-1]}"
+            cur.execute(
+                sql,
+                data,
+            )
+            con.commit()
         return True
     except Error as e:
         return False
@@ -172,10 +178,10 @@ def deleteResource(table: str, column_id: str, id: int):
                     False si no pudo crear.
     """
     try:
-        con = _connection()
-        cur = con.cursor()
-        cur.execute(f"DELETE FROM {table} WHERE {column_id} = {id}")
-        con.commit()
+        with _connection() as con:
+            cur = con.cursor()
+            cur.execute(f"DELETE FROM {table} WHERE {column_id} = {id}")
+            con.commit()
         return True
     except Error as e:
         return False

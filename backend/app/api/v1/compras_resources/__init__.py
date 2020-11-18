@@ -71,13 +71,9 @@ class ComprasResources(Resource):
             compra_column,
             compra_values,
         )
-        if compra:
-            # Obtener el id de la compra
-            id_compra = getId(self._table_compras,
-                              dict(zip(compra_column, compra_values)),
-                              'pk_id_compras')
-
+        if 'id' in compra:
             for detalle in detalle_data:
+
                 # Obtener el id del producto
                 id_producto = getId(self._table_productos,
                                     dict(nombre=detalle['producto']),
@@ -85,10 +81,10 @@ class ComprasResources(Resource):
                 # Guardar el detalle
                 detalle_compra = newResource(
                     self._table_detalles, detalle_column,
-                    [id_producto, detalle['cantidad'], id_compra])
+                    [id_producto, detalle['cantidad'], compra['id']])
 
-                if not detalle_compra:
-                    self.delete(id_compra)
+                if 'error' in detalle_compra:
+                    self.delete(compra['id'])
                     return abort(400)
 
             return ({}, 201, dict(message='item created'))

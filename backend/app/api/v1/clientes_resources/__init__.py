@@ -25,9 +25,9 @@ class ClientesResources(Resource):
     def post(self):
         result = newResource(self._table, list(request.get_json().keys()),
                              list(request.get_json().values()))
-        if not result:
+        if 'error' in result:
             return abort(400)
-        return ({}, 200, dict(message='item created'))
+        return ({}, 201, dict(message='item created'))
 
     def put(self, id: int):
         columns = list(request.get_json().keys())

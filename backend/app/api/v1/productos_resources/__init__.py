@@ -31,12 +31,12 @@ class ProductosResources(Resource):
             list(producto_data.keys()),
             list(producto_data.values()),
         )
-        id_producto = getId(self._table_productos, dict(producto_data.items()),
-                            "pk_id_productos")
-        precio_data["fk_id_productos"] = str(id_producto)
-        precio = newResource(self._table_precios, list(precio_data.keys()),
-                             list(precio_data.values()))
-        if not precio or not producto:
+        precio = dict()
+        if 'id' in producto:
+            precio_data["fk_id_productos"] = producto['id']
+            precio = newResource(self._table_precios, list(precio_data.keys()),
+                                 list(precio_data.values()))
+        if 'error' in precio or 'error' in producto:
             return abort(400)
         return ({}, 201, dict(message='item created'))
 

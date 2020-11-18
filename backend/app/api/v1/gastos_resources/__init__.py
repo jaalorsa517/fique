@@ -28,7 +28,7 @@ class GastosResources(Resource):
         result = newResource(self._table_gastos,
                              list(request.get_json().keys()),
                              list(request.get_json().values()))
-        if not result:
+        if 'error' in result:
             return abort(400)
         return ({}, 201, dict(message='item created'))
 

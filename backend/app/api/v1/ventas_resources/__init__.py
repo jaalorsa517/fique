@@ -96,26 +96,21 @@ class VentasResources(Resource):
             venta_column,
             venta_values,
         )
-        if venta:
-            # Obtener el id de la venta
-            id_venta = getId(self._table_ventas,
-                             dict(zip(venta_column, venta_values)),
-                             'pk_id_ventas')
-
+        if 'id' in venta:
             for detalle in venta_data:
                 # Obtener el id del producto
                 id_producto = getId(self._table_productos,
                                     dict(nombre=detalle['producto']),
                                     "pk_id_productos")
                 # Guardar el detalle
-                detalle_venta = newResource(self._table_detalles,
-                                            detalle_column, [
-                                                id_producto, detalle['valor'],
-                                                detalle['cantidad'], id_venta
-                                            ])
+                detalle_venta = newResource(
+                    self._table_detalles, detalle_column, [
+                        id_producto, detalle['valor'], detalle['cantidad'],
+                        venta['id']
+                    ])
 
-                if not detalle_venta:
-                    self.delete(id_venta)
+                if 'error' in detalle_venta:
+                    self.delete(venta)['id']
                     return abort(400)
 
             return ({}, 201, dict(message='item created'))
