@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from app.api.v1 import authorized
-from flask import make_response, jsonify, abort, request
+from flask import abort, request
 from app.api.models.dao import getAll, newResource, deleteResource
 
 
@@ -13,25 +13,16 @@ class GastosResources(Resource):
             'pk_id_gastos', 'fecha', 'descripcion', 'cantidad', 'valor',
             'fk_id_compras'
         ]
-        compra = getAll(self._table_gastos, _column_gastos)
-        if compra is None:
+        gasto = getAll(self._table_gastos, _column_gastos)
+        if gasto is None:
             return abort(400)
-        elif len(compra) == 0:
-            return make_response(
-                jsonify(response=dict(
-                    status="ok", http_code="204", message="No exist data")),
-                204,
-            )
+        elif len(gasto) == 0:
+            return ({}, 204, dict(message='No exist data'))
+
         else:
-            return make_response(
-                jsonify(
-                    response=dict(status="ok",
-                                  http_code="200",
-                                  message="sucess"),
-                    data=compra,
-                ),
-                200,
-            )
+            for i in range(len(gasto)):
+                gasto[i]['fecha'] = gasto[i]['fecha'].strftime('%Y-%m-%d')
+            return (gasto, 200, dict(message='sucess'))
 
     def post(self):
         result = newResource(self._table_gastos,
@@ -39,17 +30,11 @@ class GastosResources(Resource):
                              list(request.get_json().values()))
         if not result:
             return abort(400)
-        return make_response(
-            jsonify(response=dict(
-                status='ok', http_code='201', message='item created')), 201)
+        return ({}, 201, dict(message='item created'))
 
     def delete(self, id: int):
         column_id = "pk_id_gastos"
-        result = deleteResource(self._table, column_id, id)
+        result = deleteResource(self._table_gastos, column_id, id)
         if not result:
             return abort(400)
-        return make_response(
-            jsonify(response=dict(
-                status="ok", http_code="200", message="item deleted")),
-            204,
-        )
+        return ({}, 200, dict(message='item deleted'))

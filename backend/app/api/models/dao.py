@@ -29,6 +29,7 @@ def getRaw(sql: str, columns: List):
         if len(rows) > 0:
             for row in rows:
                 data.append(dict(zip(columns, row)))
+            return data
     except Error as e:
         return None
 

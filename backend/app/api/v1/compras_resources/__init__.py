@@ -1,12 +1,14 @@
 from flask_restful import Resource
 from app.api.v1 import authorized
-from flask import make_response, jsonify, request, abort
+from flask import request, abort
 from app.api.models.dao import deleteResource, getAll, getId, getRaw, newResource
+from datetime import datetime
 
 
 class ComprasResources(Resource):
     _table_compras = "compras"
     _table_detalles = "detalles_compras"
+    _table_productos = "productos"
 
     decorators = [authorized.login_required]
 
@@ -25,50 +27,37 @@ class ComprasResources(Resource):
         compra = getAll(self._table_compras, _columns_compra)
         if compra is not None:
             # Para traer los detalles de la compra
-            detalles_list = []
-            for d in compra:
+            for i in range(len(compra)):
                 detalle = getRaw(
                     """
                     SELECT {c} FROM {d} 
-                    INNER JOIN productos ON productos.pk_id_productos=detalles_compras.fk_id_productos
+                    INNER JOIN productos ON productos.pk_id_productos = detalles_compras.fk_id_productos
                     WHERE fk_id_compras = {pk}
                     """.format(
                         c=str.join(",", _columns_detalle),
                         d=self._table_detalles,
-                        pk=d["pk_id_compras"],
+                        pk=compra[i]["pk_id_compras"],
                     ),
                     _columns_detalle,
                 )
+                compra[i]['fecha'] = compra[i]['fecha'].strftime('%Y-%m-%d')
                 if detalle is not None:
-                    detalles_list.append(detalle)
-
-            compra["compra"] = detalles_list
+                    compra[i]["compra"] = detalle
 
         if compra is None:
             return abort(400)
 
         elif len(compra) == 0:
-            return make_response(
-                jsonify(response=dict(
-                    status="ok", http_code="204", message="No exist data")),
-                204,
-            )
+            return ({}, 204, dict(message='no exist data'))
+
         else:
-            return make_response(
-                jsonify(
-                    response=dict(status="ok",
-                                  http_code="200",
-                                  message="sucess"),
-                    data=compra,
-                ),
-                200,
-            )
+            return (compra, 200, dict(message='sucess'))
 
     def post(self):
         compra_data = request.get_json()
         detalle_data = compra_data.pop("compra")
         detalle_column = [
-            "fk_id_producto",
+            "fk_id_productos",
             'cantidad',
             'fk_id_compras',
         ]
@@ -88,10 +77,10 @@ class ComprasResources(Resource):
                               dict(zip(compra_column, compra_values)),
                               'pk_id_compras')
 
-            for detalle in compra_data:
+            for detalle in detalle_data:
                 # Obtener el id del producto
                 id_producto = getId(self._table_productos,
-                                    dict(zip('nombre', detalle['producto'])),
+                                    dict(nombre=detalle['producto']),
                                     "pk_id_productos")
                 # Guardar el detalle
                 detalle_compra = newResource(
@@ -99,25 +88,19 @@ class ComprasResources(Resource):
                     [id_producto, detalle['cantidad'], id_compra])
 
                 if not detalle_compra:
+                    self.delete(id_compra)
                     return abort(400)
 
-            return make_response(
-                jsonify(response=dict(
-                    status="ok", http_code="201", message="item created")),
-                201,
-            )
+            return ({}, 201, dict(message='item created'))
+
         else:
             return abort(400)
 
     def delete(self, id):
-        column_fk_compras = "fk_id_ventas"
-        column_id_compras = "pk_id_ventas"
+        column_fk_compras = "fk_id_compras"
+        column_id_compras = "pk_id_compras"
         detalle = deleteResource(self._table_detalles, column_fk_compras, id)
-        compra = deleteResource(self._table_ventas, column_id_compras, id)
+        compra = deleteResource(self._table_compras, column_id_compras, id)
         if not compra or not detalle:
             return abort(400)
-        return make_response(
-            jsonify(response=dict(
-                status="ok", http_code="200", message="item deleted")),
-            204,
-        )
+        return ({}, 200, dict(message='item deleted'))

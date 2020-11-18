@@ -1,13 +1,13 @@
 from flask_restful import Resource
-from flask import make_response, jsonify, abort, request
+from flask import abort, request
 from app.api.v1 import authorized
 from app.api.models.dao import (
     getRaw,
     getId,
     newResource,
-    updateResource,
     deleteResource,
 )
+from datetime import datetime
 
 
 class VentasResources(Resource):
@@ -15,6 +15,7 @@ class VentasResources(Resource):
     _table_ventas = "ventas"
     _table_detalles = "detalles_ventas"
     _table_clientes = "clientes"
+    _table_productos = "productos"
 
     decorators = [authorized.login_required]
 
@@ -42,8 +43,7 @@ class VentasResources(Resource):
         )
         if venta is not None:
             # Para traer los detalles de la venta
-            detalles_list = []
-            for d in venta:
+            for i in range(len(venta)):
                 detalle = getRaw(
                     """
                     SELECT {c} FROM {d} 
@@ -52,48 +52,38 @@ class VentasResources(Resource):
                     """.format(
                         c=str.join(",", _columns_detalle),
                         d=self._table_detalles,
-                        pk=d["pk_id_ventas"],
+                        pk=venta[i]["pk_id_ventas"],
                     ),
                     _columns_detalle,
                 )
+                venta[i]['fecha'] = venta[i]['fecha'].strftime('%Y-%m-%d')
                 if detalle is not None:
-                    detalles_list.append(detalle)
-
-            venta["venta"] = detalles_list
+                    venta[i]["venta"] = detalle
 
         if venta is None:
             return abort(400)
 
         elif len(venta) == 0:
-            return make_response(
-                jsonify(response=dict(
-                    status="ok", http_code="204", message="No exist data")),
-                204,
-            )
+            return ({}, 204, dict(message='No exist data'))
+
         else:
-            return make_response(
-                jsonify(
-                    response=dict(status="ok",
-                                  http_code="200",
-                                  message="sucess"),
-                    data=venta,
-                ),
-                200,
-            )
+            return (venta, 200, dict(message='sucess'))
 
     def post(self):
         producto_data = request.get_json()
         venta_data = producto_data.pop("venta")
         cliente_column = ["nombre", "apellido"]
         detalle_column = [
-            "fk_id_producto", 'valor', 'cantidad', 'fk_id_ventas'
+            "fk_id_productos", 'valor', 'cantidad', 'fk_id_ventas'
         ]
 
         # Obtener id_cliente
         id_cliente = getId(
             self._table_clientes,
-            dict(zip(cliente_column, str.split(" ",
-                                               producto_data["cliente"]))),
+            dict(
+                zip(cliente_column,
+                    [producto_data['nombre'], producto_data['apellido'] or ""
+                     ])),
             "pk_id_clientes",
         )
 
@@ -115,7 +105,7 @@ class VentasResources(Resource):
             for detalle in venta_data:
                 # Obtener el id del producto
                 id_producto = getId(self._table_productos,
-                                    dict(zip('nombre', detalle['producto'])),
+                                    dict(nombre=detalle['producto']),
                                     "pk_id_productos")
                 # Guardar el detalle
                 detalle_venta = newResource(self._table_detalles,
@@ -125,13 +115,11 @@ class VentasResources(Resource):
                                             ])
 
                 if not detalle_venta:
+                    self.delete(id_venta)
                     return abort(400)
 
-            return make_response(
-                jsonify(response=dict(
-                    status="ok", http_code="201", message="item created")),
-                201,
-            )
+            return ({}, 201, dict(message='item created'))
+
         else:
             return abort(400)
 
@@ -194,8 +182,4 @@ class VentasResources(Resource):
         venta = deleteResource(self._table_ventas, column_id_ventas, id)
         if not venta or not detalle:
             return abort(400)
-        return make_response(
-            jsonify(response=dict(
-                status="ok", http_code="200", message="item deleted")),
-            204,
-        )
+        return ({}, 200, dict(message='item deleted'))
