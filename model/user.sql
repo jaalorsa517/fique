@@ -1,5 +1,2 @@
-SELECT pk_id_productos,nombre,existencia,valor_compra,valor_por_mayor,valor_deltal 
-FROM precios  
-INNER JOIN productos ON productos.pk_id_productos=precios.fk_id_productos;
-
-SELECT * FROM precios;
+INSERT INTO users (`nickname`,`password`)VALUES('prueba','pbkdf2:sha256:150000$wG4W4VZS$e720c809789ad7c8d2b2b6fee7142847c549d0ee5bcd634c916fbcb01ec6c757'
+);

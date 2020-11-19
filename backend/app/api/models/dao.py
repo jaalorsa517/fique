@@ -30,7 +30,7 @@ def getRaw(sql: str, columns: List):
         if len(rows) > 0:
             for row in rows:
                 data.append(dict(zip(columns, row)))
-            return data
+        return data
     except Error as e:
         rows = [dict(error=e)]
         return rows
@@ -50,11 +50,12 @@ def getId(table: str, item: dict, id: str):
         _id = []
         with _connection().cursor() as cur:
             cur.execute(
-                "SELECT {id} FROM {table} WHERE {wh}".format(
+                "SELECT `{id}` FROM {table} WHERE {wh}".format(
                     id=id,
                     table=table,
                     wh=str.join(" AND ",
-                                ["{} = ? ".format(k) for (k) in item.keys()]),
+                                ["`{}` = ? ".format(k)
+                                 for (k) in item.keys()]),
                 ),
                 list(item.values()),
             )
@@ -80,11 +81,11 @@ def getWithJoin(table1: str, table2: str, column1: list, column2: list,
     data = []
     try:
         rows = []
-        col1 = str.join(",", column1)
-        col2 = str.join(",", column2)
+        col1 = str.join("`,`", column1)
+        col2 = str.join("`,`", column2)
         with _connection().cursor() as cur:
             cur.execute(
-                f"SELECT {col1},{col2} FROM {table1} INNER JOIN {table2} ON {table1}.{keyUnion}={table2}.f{keyUnion[1:]}"
+                f"SELECT `{col1}`,`{col2}` FROM {table1} INNER JOIN {table2} ON {table1}.`{keyUnion}`={table2}.`f{keyUnion[1:]}`"
             )
             rows = cur.fetchall()
         if len(rows) > 0:
@@ -107,9 +108,9 @@ def getAll(table: str, columns: list):
     data = []
     try:
         rows = []
-        col = str.join(",", columns)
+        col = str.join("`,`", columns)
         with _connection().cursor() as cur:
-            cur.execute(f"SELECT {col} FROM {table}")
+            cur.execute(f"SELECT `{col}` FROM {table}")
             rows = cur.fetchall()
         if len(rows) > 0:
             for row in rows:
@@ -132,7 +133,7 @@ def newResource(table: str, columns: list, data: list):
         with _connection() as con:
             cur = con.cursor()
             cur.execute(
-                f"INSERT INTO {table} ({str.join(',',columns)}) VALUES ({str.join(',',['?' for i in range(len(data))])})",
+                f"INSERT INTO {table} (`{str.join('`,`',columns)}`) VALUES ({str.join(',',['?' for i in range(len(data))])})",
                 data,
             )
             con.commit()
@@ -143,7 +144,7 @@ def newResource(table: str, columns: list, data: list):
         return dict(error=str(e))
 
 
-def updateResource(table: str, columns: list, data: list):
+def updateResource(table: str, columns: list, data: list, id: dict):
     """
     Funcion que actualiza un item en el recurso
     :param table->Nombre de la tabla a consultar
@@ -155,10 +156,10 @@ def updateResource(table: str, columns: list, data: list):
     try:
         with _connection() as con:
             cur = con.cursor()
-            sql = f"UPDATE {table} SET {columns[0]} = ?"
+            sql = f"UPDATE {table} SET `{columns[0]}` = ?"
             for i in range(1, len(columns) - 1):
-                sql += f", {columns[i]} = ?"
-            sql += f" WHERE {columns[len(columns)-1]} = {data[len(data)-1]}"
+                sql += f", `{columns[i]}` = ?"
+            sql += f" WHERE {list(id.keys())[0]} = {id[list(id.keys())[0]]}"
             cur.execute(
                 sql,
                 data,

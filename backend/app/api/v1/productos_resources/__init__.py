@@ -68,16 +68,14 @@ class ProductosResources(Resource):
         precio_data["valor_compra"] = producto_data.pop("valorCompra")
         precio_data["valor_por_mayor"] = producto_data.pop("valorPorMayor")
         precio_data["valor_deltal"] = producto_data.pop("valorDeltal")
-        producto_data["pk_id_productos"] = id
-        producto = updateResource(
-            self._table_productos,
-            list(producto_data.keys()),
-            list(producto_data.values()),
-        )
+        producto = updateResource(self._table_productos,
+                                  list(producto_data.keys()),
+                                  list(producto_data.values()),
+                                  dict(pk_id_productos=id))
         id_precio = getId(self._table_precios, precio_data, "pk_id_precios")
-        precio_data["pk_id_precios"] = str(id_precio)
         precio = updateResource(self._table_precios, list(precio_data.keys()),
-                                list(precio_data.values()))
+                                list(precio_data.values()),
+                                dict(pk_id_precios=id_precio))
 
         if not precio or not producto:
             return abort(400)

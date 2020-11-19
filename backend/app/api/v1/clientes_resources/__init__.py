@@ -32,10 +32,9 @@ class ClientesResources(Resource):
     def put(self, id: int):
         columns = list(request.get_json().keys())
         values = list(request.get_json().values())
-        columns.append("pk_id_clientes")
-        values.append(id)
         result = updateResource(self._table, list(request.get_json().keys()),
-                                list(request.get_json().values()))
+                                list(request.get_json().values()),
+                                dict(pk_id_clientes=id))
         if not result:
             return abort(400)
         return ({}, 201, dict(message='item modificated'))
