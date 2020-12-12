@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  mariadb:
+    container_name: mariadb
+    restart: always
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - /home/jaalorsa/Docker/mariadb_data/:/var/lib/mysql
+    networks:
+      default:
+        ipv4_address: 172.18.0.20
+
+  flask:
+    container_name: flask_app
+    build:
+      context: .
+      dockerfile: ./services/python_docker/Dockerfile
+    restart: always
+    environment:
+      FLASK_APP: main.py
+      FLASK_ENV: development
+      FLASK_DEBUG: 1
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: fique
+      MYSQL_HOST: 172.18.0.20
+    command: gunicorn -b 0.0.0.0:5000 main:fique_app
+    volumes:
+      - .:/web_app
+    expose:
+      - 5000
+    networks:
+      default:
+        ipv4_address: 172.18.0.10
+
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: ./services/nginx_docker/Dockerfile
+    ports:
+      - 8080:80
+    depends_on:
+      - flask
+    volumes:
+      - .:/web_app
+
+networks:
+  default:
+    external:
+      name: share_containers
