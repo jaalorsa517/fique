@@ -49,8 +49,7 @@ export default Vue.extend({
 <style lang="stylus">
 .landing > h1
   margin 0
-  margin-left 15px
-  -webkit-text-stroke: 1px black
+  margin-left $margin-left
 
 p
   margin auto 20px

@@ -44,8 +44,7 @@ export default Vue.extend({
     transform-origin center left
 
     img
-        width 100%
-        height 100%
+        $size-square(100%)
 
 .carousel-item:hover ~ .carousel-item
     transform translate3d(50px, 0, 0)

@@ -2,10 +2,21 @@
     header
         .logo
             img.logo__img(src="@/assets/logo.png" alt="logo")
-        .login
-            .login__button
-                span Ingresar
+        button-head
+        
 </template>
+
+<script lang="ts">
+import Vue from "vue";
+import buttonHead from "@/components/buttonHead.vue";
+
+export default Vue.extend({
+  name: "Head-App",
+  components: {
+    buttonHead
+  }
+});
+</script>
 
 <style lang="stylus">
 header
@@ -15,15 +26,7 @@ header
 
 .logo
     margin-left 35%
-.login__button
-    width 78px
-    height 25px
-    text-align center
-    line-height 25px
-    color $color-font
-    background: $color-button
-    box-shadow: 0px 4px 4px rgba(7, 7, 7, 0.45);
-    border-radius: 10px;
+
 
 @media screen and (min-width: 600px)
     header
@@ -31,6 +34,4 @@ header
         margin auto
     .logo
         margin-left 40%
-    .login__button
-        margin-top 10px
 </style>

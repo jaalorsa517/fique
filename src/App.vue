@@ -21,6 +21,7 @@ export default Vue.extend({
 
 body
   display flex
+  height 100%
   flex-direction column
   margin 0
   padding 0
@@ -31,6 +32,8 @@ body
 #app
   h1,h2,h3
     font-family 'Bangers', cursive
+    font-size 2rem
     color $color-title
+    -webkit-text-stroke: 1px black
     text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25)
 </style>
