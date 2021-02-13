@@ -23,7 +23,6 @@
 <style lang="stylus">
 .footer
     margin-top auto
-    height 50px
     background-color rgba(0,0,0,0)
     $flex-hor()
     color $color-font

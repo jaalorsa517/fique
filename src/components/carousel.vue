@@ -16,15 +16,19 @@ export default Vue.extend({
 </script>
 
 <style lang="stylus">
+::-webkit-scrollbar
+    display none
 
 .carousel
     $flex-hor()
+    padding 10px
     position relative
     overflow auto
 
 .carousel__container
-    margin 5px 0
-    padding 50px 10px
+    width 100%
+    margin 10px 0
+    padding 50px
     white-space nowrap
 
 .carousel-item
@@ -53,4 +57,8 @@ export default Vue.extend({
 
     .carousel-item
         opacity 0.3
+
+@media screen and (min-width: 600px)
+    .carousel__container
+        $flex-hor()
 </style>

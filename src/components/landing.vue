@@ -47,7 +47,22 @@ export default Vue.extend({
 </script>
 
 <style lang="stylus">
+.landing > h1
+  margin 0
+  margin-left 15px
+  -webkit-text-stroke: 1px black
+
 p
-  color $color-font
+  margin auto 20px
   text-align center
+  line-height 1.5
+  color $color-font
+
+  > b
+    line-height 3
+
+@media screen and (min-width: 600px)
+  .landing
+    max-width 600px
+    margin auto
 </style>
