@@ -6,18 +6,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import Vue from "vue";
 import landing from "@/components/landing.vue";
 import FooterApp from "@/components/footerApp.vue";
 
-@Component({
+export default Vue.extend({
   name: "Home",
   components: {
     landing,
     FooterApp
   }
-})
-export default class Home extends Vue {}
+});
 </script>
 
 <style lang="stylus">

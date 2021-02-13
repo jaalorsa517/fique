@@ -30,7 +30,7 @@
 
 .contacts-container
     display flex
-    justify-content start
+    justify-content flex-start
 
 .contacts-child
     margin 2px 5px

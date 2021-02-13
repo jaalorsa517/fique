@@ -17,7 +17,7 @@ export default Vue.extend({
 </script>
 
 <style lang="stylus">
-@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Indie+Flower&family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap');
 
 body
   display flex
@@ -29,7 +29,6 @@ body
   background-repeat no-repeat
 
 #app
-  height 100%
   h1,h2,h3
     font-family 'Bangers', cursive
     color $color-title
