@@ -12,6 +12,20 @@ module.exports = {
     types.forEach((type) =>
       addStyleResource(config.module.rule("stylus").oneOf(type))
     );
+  },
+  pwa: {
+    name: "My App",
+    themeColor: "#4DBA87",
+    msTileColor: "#000000",
+    appleMobileWebAppCapable: "yes",
+    appleMobileWebAppStatusBarStyle: "black",
+
+    // configure the workbox plugin
+    workboxPluginMode: "GenerateSW",
+    workboxOptions: {
+      swDest: "service-worker",
+      skipWaiting: true
+    }
   }
 };
 

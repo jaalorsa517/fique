@@ -1,5 +1,5 @@
 <template lang="pug">
-    section.login
+    section.Login
         h1 Bienvenido
         h4 Ingrese los datos para iniciar sesión
         form
@@ -7,11 +7,11 @@
             input.username.input(type="text" name="username" autocomplete="off")
             label(for="password") Contraseña
             input.password.input(type="password" name="password")
-            input.submit.input(type="button" value="INGRESAR")
+            input.submit.input(type="button" value="INGRESAR" @click="$router.replace({name: 'Dashboard'})")
 </template>
 
 <style lang="stylus">
-.login
+.Login
     margin-bottom 30vh
     $flex-ver()
     > h1

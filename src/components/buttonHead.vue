@@ -4,7 +4,7 @@
             router-link(to="/")
                 img(src="@/assets/inicio-icon.png" alt="home icon")
         .login__button(v-else)
-            router-link.ancle(to="/login") Ingresar
+            router-link.ancle(to="Login") Ingresar
 </template>
 
 <script lang="ts">
@@ -40,7 +40,7 @@ export default Vue.extend({
 .login__button:hover , .to-house:hover
     transform scale(1.2)
 
-@media screen and (min-width: 600px)
-    .login__button,.to-house
-        margin-top 10px
+// @media screen and (min-width: 600px)
+//     .login__button,.to-house
+//         margin-top 10px
 </style>

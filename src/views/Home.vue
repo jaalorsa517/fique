@@ -1,5 +1,5 @@
 <template lang="pug">
-  .Home
+  section.Home
     landing
     footer-app
 
